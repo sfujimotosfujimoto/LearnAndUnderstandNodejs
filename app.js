@@ -1,8 +1,31 @@
 var fs = require("fs");
+var zlib = require("zlib");
 
-var greet = fs.readFileSync(__dirname + "/greet.txt", "utf8");
+var readable = fs.createReadStream(__dirname + "/greet.txt");
 
-console.log(greet);
+var writable = fs.createWriteStream(__dirname + "/greet_copy.txt");
+
+var compressed = fs.createWriteStream(__dirname + "/greet.txt.gz");
+var gzip = zlib.createGzip();
+// this does the same as below
+readable.pipe(writable);
+
+readable.pipe(gzip).pipe(compressed);
+
+// readable.on("data", function(chunk)
+//   console.log(chunk.length);
+//   writable.write(chunk);
+// });
+
+// var greet = fs.readFileSync(__dirname + "/greet.txt", "utf8");
+//
+// console.log(greet);
+//
+// var greet2 = fs.readFile(__dirname + "/greet.txt", "utf8", function(err, data) {
+//   console.log(data);
+// });
+//
+// console.log("DONE!");
 
 // var buf = new Buffer("Hello", "utf8"); //utf8 is default
 // console.log(buf);
