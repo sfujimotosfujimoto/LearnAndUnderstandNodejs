@@ -1,43 +1,27 @@
-var fs = require("fs");
-var zlib = require("zlib");
+const express = require("express");
+const app = express();
 
-var readable = fs.createReadStream(__dirname + "/greet.txt");
+const port = process.env.PORT || 3000;
 
-var writable = fs.createWriteStream(__dirname + "/greet_copy.txt");
+app.use("/assets", express.static(__dirname + "/public"));
 
-var compressed = fs.createWriteStream(__dirname + "/greet.txt.gz");
-var gzip = zlib.createGzip();
-// this does the same as below
-readable.pipe(writable);
+app.set("view engine", "ejs");
 
-readable.pipe(gzip).pipe(compressed);
+app.use("/", function(req, res, next) {
+  console.log("Request Url: " + req.url);
+  next();
+});
 
-// readable.on("data", function(chunk)
-//   console.log(chunk.length);
-//   writable.write(chunk);
-// });
+app.get("/", function(req, res) {
+  res.render("index"); // looks for 'view' for default
+});
 
-// var greet = fs.readFileSync(__dirname + "/greet.txt", "utf8");
-//
-// console.log(greet);
-//
-// var greet2 = fs.readFile(__dirname + "/greet.txt", "utf8", function(err, data) {
-//   console.log(data);
-// });
-//
-// console.log("DONE!");
+app.get("/person/:id", function(req, res) {
+  res.render("person", { ID: req.params.id });
+});
 
-// var buf = new Buffer("Hello", "utf8"); //utf8 is default
-// console.log(buf);
-// console.log(buf.toString());
-// console.log(buf.toJSON());
-// console.log(buf[2]);
-//
-// buf.write("wo");
-// console.log(buf.toString());
+app.get("/api", function(req, res) {
+  res.json({ firstname: "John", lastname: "Doe" });
+});
 
-// var buffer = new ArrayBuffer(8); // 8 x 8 = 64 zeros and ones
-// var view = new Int32Array(buffer);
-// view[0] = 5;
-// view[1] = 15;
-// console.log(view);
+app.listen(port);
